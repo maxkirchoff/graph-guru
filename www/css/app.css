@@ -1,0 +1,77 @@
+<!--
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700);
+
+*, body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background: #eeeeee !important;
+}
+
+#post-list, #post-type-info {
+    float: left;
+    background: #cecece;
+    border-radius: 15px;
+    padding: 10px;
+    font-size: .8em;
+    margin: 10px;
+}
+#post-list {
+    width: 500px;
+}
+
+#post-type-info {
+    width: 350px;
+    font-size: .9em;
+    font-weight: bold;
+}
+
+hr {
+    border: none;
+    background: black;
+    height: 2px;
+}
+
+.score {
+    color: red;
+    font-size: 1.1em;
+}
+
+#headerWrapper {
+    background: #FFF;
+    border-bottom: 1px solid #DCDCDC;
+    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.08);
+    -moz-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.08);
+    -webkit-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.08);
+    margin-bottom: 10px;
+}
+
+#blogTitle {
+    display: block;
+    text-indent: -9000px;
+    background: url('https://www.shopigniter.com/wp-content/themes/shopigniter/library/images/logo.gif') no-repeat left 13px;
+    width: 179px;
+    height: 60px;
+    font-size: 34px;
+    font-weight: bold;
+    line-height: 60px;
+}
+
+#postsViewHeader, #posts, #pageView, #fbLoginWrapper {
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom:15px;
+}
+
+#postsViewHeader div, #pageView h1, #pageList {
+    margin: 15px;
+}
+
+#postsWrapper {
+    margin: 15px;
+}
+
+
+-->
