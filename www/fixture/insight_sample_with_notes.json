@@ -99,6 +99,7 @@
             "values": [
                 {
                     "value": {
+                        "video play": 1,
                         "photo view": 1,
                         "link clicks": 1,
                         "other clicks": 1
@@ -107,7 +108,7 @@
             ],
             "title": "Lifetime Post consumers by type",
             "description": "Lifetime The number of people who clicked anywhere in your post, by type. Clicks generating stories are included in \"Other Clicks.\" (Unique Users)",
-            "notes": "Video plays on the post seem to be captured in 'other clicks' along with many other click actions in the post."
+            "notes": "Video plays seem to be inconsistently captured on 'other clicks' and/or 'video play'."
         },
         {
             "id": "page_id/insights/post_consumptions_by_type/lifetime",
@@ -116,6 +117,7 @@
             "values": [
                 {
                     "value": {
+                        "video play": 1,
                         "photo view": 1,
                         "link clicks": 1,
                         "other clicks": 1
@@ -124,7 +126,7 @@
             ],
             "title": "Lifetime Post Consumptions by type",
             "description": "Lifetime The number of clicks anywhere in your post, by type. Clicks generating stories are included in \"Other Clicks.\" (Total Count)",
-            "notes": "Video plays on the post seem to be captured in 'other clicks' along with many other click actions in the post."
+            "notes": "Video plays seem to be inconsistently captured on 'other clicks' and/or 'video play'."
 
         },
         {

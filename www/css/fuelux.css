@@ -6171,48 +6171,48 @@ textarea.span1,
   margin-right: 4px;
   margin-left: -20px;
   background-image: url(../img/form.png);
-  background-position: 0 1px;
+  background-position: 0 3px;
   background-repeat: no-repeat;
 }
 
 .fuelux .checkbox-custom i.checked {
   /* checked */
 
-  background-position: -48px 1px;
+  background-position: -48px 3px;
 }
 
 .fuelux .checkbox-custom i.disabled {
   /* disabled */
 
-  background-position: -64px 1px;
+  background-position: -64px 3px;
 }
 
 .fuelux .checkbox-custom i.disabled.checked {
   /* disabled and checked */
 
-  background-position: -80px 1px;
+  background-position: -80px 3px;
 }
 
 .fuelux .checkbox-custom:hover i {
-  background-position: -16px 1px;
+  background-position: -16px 3px;
 }
 
 .fuelux .checkbox-custom:hover i.checked {
   /* checked */
 
-  background-position: -32px 1px;
+  background-position: -32px 3px;
 }
 
 .fuelux .checkbox-custom:hover i.disabled {
   /* disabled */
 
-  background-position: -64px 1px;
+  background-position: -64px 3px;
 }
 
 .fuelux .checkbox-custom:hover i.disabled.checked {
   /* disabled and checked */
 
-  background-position: -80px 1px;
+  background-position: -80px 3px;
 }
 
 .fuelux .combobox {

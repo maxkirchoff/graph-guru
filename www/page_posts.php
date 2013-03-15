@@ -3,7 +3,7 @@
 
         </div>
         <div class="row">
-            <div id="postsViewHeader" class="span10 offset1">
+            <div id="postsViewHeader" class="span12 offset1">
                 <div>
                     <h1>Overview by Post Type</h1>
                     <table class="table table-bordered table-striped">
@@ -28,9 +28,102 @@
             </div>
         </div>
         <div class="row">
-            <div id="posts" class="span10 offset1">
+            <div id="posts" class="span12 offset1">
                 <div id="postsWrapper">
                     <h1>Post Metrics</h1>
+                    <div class="accordion" id="accordion2">
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                    <i class="icon-align-justify"></i> <strong>Modify Score Formula</strong>
+                                </a>
+                            </div>
+                            <div id="collapseOne" class="accordion-body collapse in">
+                                <div class="accordion-inner">
+                                    <div class="span5">
+                                        <div>
+                                            <h5>Construct a custom score formula</h5>
+                                            <p>Use the variable and operator guides to the left to construct a custom formula. You may also introduce standard numbers and organize your operations by wrapping them in parens '()'</p>
+                                            <form id="formulaForm">
+                                                <textarea style="width:100%" rows="10">(likes+comments+shares)/impressions</textarea><br />
+                                                <input type="submit" value="Recalculate"/>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <h3></h3>
+                                        </div>
+                                    </div>
+                                    <div class="span3">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                            <tr>
+                                                <th>Measure</th>
+                                                <th>Formula Variable</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Likes</td>
+                                                <td>likes</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Comments</td>
+                                                <td>comments</td>
+                                            </tr><tr>
+                                                <td>Shares</td>
+                                                <td>shares</td>
+                                            </tr><tr>
+                                                <td>Photo Views</td>
+                                                <td>photo_views</td>
+                                            </tr><tr>
+                                                <td>Video Plays</td>
+                                                <td>video_plays</td>
+                                            </tr><tr>
+                                                <td>Link Clicks</td>
+                                                <td>link_clicks</td>
+                                            </tr><tr>
+                                                <td>Impressions</td>
+                                                <td>impressions</td>
+                                            </tr><tr>
+                                                <td>Reach</td>
+                                                <td>reach</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="span3">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                            <tr>
+                                                <th>Operation</th>
+                                                <th>Operator</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Addition</td>
+                                                <td>+</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Subtraction</td>
+                                                <td>-</td>
+                                            </tr><tr>
+                                                <td>Multiplication</td>
+                                                <td>*</td>
+                                            </tr><tr>
+                                                <td>Division</td>
+                                                <td>/</td>
+                                            </tr><tr>
+                                                <td>Order of Operations</td>
+                                                <td>()</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <table id="postGrid" class="table table-bordered datagrid">
                             <thead>

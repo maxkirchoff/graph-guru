@@ -74,10 +74,10 @@ class Guru
         $page['posts'] = $this->get_page_posts($page_id);
 
         // grab post score averages by type and load into page array
-        $page['average_scores']['photo'] = $this->get_average_score_by_type($page['posts'], 'photo');
-        $page['average_scores']['link'] = $this->get_average_score_by_type($page['posts'], 'link');
-        $page['average_scores']['video'] = $this->get_average_score_by_type($page['posts'], 'video');
-        $page['average_scores']['status'] = $this->get_average_score_by_type($page['posts'], 'status');
+        // $page['average_scores']['photo'] = $this->get_average_score_by_type($page['posts'], 'photo');
+        // $page['average_scores']['link'] = $this->get_average_score_by_type($page['posts'], 'link');
+        // $page['average_scores']['video'] = $this->get_average_score_by_type($page['posts'], 'video');
+        // $page['average_scores']['status'] = $this->get_average_score_by_type($page['posts'], 'status');
 
         return $page;
     }
@@ -169,25 +169,45 @@ class Guru
         $posts = $this->remove_weirdness($posts);
 
         // grabs all the posts scores
-        $posts = $this->get_posts_scores($posts);
+        // $posts = $this->get_posts_scores($posts);
 
         return $posts;
     }
 
-    /**
-     * @param array $posts
-     * @return array
-     */
     protected function get_posts_insights(array $posts)
     {
-        // gets likes, comments, shares
-        $posts = $this->get_posts_lcs($posts);
+        // This checks count as we use FB Graph API batcher which has a max of 50 requests per call
+        if (count($posts) > 50)
+        {
+            // handles chunking and batching of anything larger than 50 posts
+            $posts = $this->post_chunk_batcher($posts, __FUNCTION__);
+        }
+        else
+        {
+            // send out posts for batch processing!
+            $posts_batch_response = $this->process_batch($posts, '/insights');
 
-        // gets impressions
-        $posts = $this->get_posts_impressions($posts);
+            // separate indices and value to match our response to it's requesting post index
+            foreach ($posts_batch_response as $insight_key => $insight_response)
+            {
+                $insight_response_body = json_decode($insight_response['body'], TRUE);
 
-        // gets click counts
-        $posts = $this->get_posts_clicks($posts);
+                if (!empty($insight_response_body['data']))
+                {
+                    foreach ($insight_response_body['data'] as $insight)
+                    {
+                        if (isset($insight['values'][0]['value']))
+                        {
+                            $posts[$insight_key]['insights'][$insight['name']] = $insight['values'][0]['value'];
+                        }
+                    }
+                }
+                else
+                {
+                    unset($posts[$insight_key]);
+                }
+            }
+        }
 
         return $posts;
     }
@@ -205,7 +225,7 @@ class Guru
         foreach ($posts as $post_index => $post)
         {
             // No impressions, then we have to assume the worst.
-            if ($post['impressions'] <= 0)
+            if (!isset($post['insights']['post_impressions']) || $post['insights']['post_impressions'] <= 0)
             {
                 unset($posts[$post_index]);
             }
@@ -254,178 +274,6 @@ class Guru
     }
 
     /**
-     * Grabs the actual likes, comments, shares of posts
-     *
-     * @param array $posts
-     * @return array
-     */
-    protected function get_posts_lcs(array $posts)
-    {
-        // This checks count as we use FB Graph API batcher which has a max of 50 requests per call
-        if (count($posts) > 50)
-        {
-            // handles chunking and batching of anything larger than 50 posts
-            $posts = $this->post_chunk_batcher($posts, __FUNCTION__);
-        }
-        else
-        {
-            // send out posts for batch processing!
-            $posts_batch_response = $this->process_batch($posts, '/insights/post_story_adds_by_action_type_unique/lifetime');
-
-            // separate indices and value to match our response to it's requesting post index
-            foreach ($posts_batch_response as $lcs_key => $lcs_response)
-            {
-                // any post with a 0 for any of these will just NOT return that field
-                // so protect ourselves by always starting with 0
-                $lcs = array(
-                    'like' => 0,
-                    'comment' => 0,
-                    'share' => 0
-                );
-
-                // decode the lcs response
-                $lcs_response_body = json_decode($lcs_response['body'], TRUE);
-
-                // check that our insights endpoint has ANY value
-                if (isset($lcs_response_body['data'][0]['values'][0]['value']))
-                {
-                    // load as var for ease of use
-                    $lcs_insight_values = $lcs_response_body['data'][0]['values'][0]['value'];
-
-                    // loop the previously specified lcs known actions
-                    foreach ($lcs as $action => $value)
-                    {
-                        // if our response contained an entry for that type of action...
-                        if (isset($lcs_insight_values[$action]))
-                        {
-                            // record the value
-                            $lcs[$action] = $lcs_insight_values[$action];
-                        }
-                    }
-                }
-
-                // set the LCS in our post by index
-                $posts[$lcs_key]['lcs'] = $lcs;
-            }
-        }
-
-        return $posts;
-    }
-
-    /**
-     * Grabs the clicks in a post
-     *
-     * Known types are photo view, link click, other clicks ...may be more, this is NOT documented by FB.
-     *
-     * @param array $posts
-     * @return array
-     */
-    protected function get_posts_clicks(array $posts)
-    {
-        // This checks count as we use FB Graph API batcher which has a max of 50 requests per call
-        if (count($posts) > 50)
-        {
-            // handles chunking and batching of anything larger than 50 posts
-            $posts = $this->post_chunk_batcher($posts, __FUNCTION__);
-        }
-        else
-        {
-            // send out posts for batch processing!
-            $posts_batch_response = $this->process_batch($posts, '/insights/post_consumptions_by_type_unique/lifetime');
-
-            // separate indices and value to match our response to it's requesting post index
-            foreach ($posts_batch_response as $clicks_key => $clicks_response)
-            {
-                // known click types AND our fabricated 'total'
-                $post_clicks = array(
-                    'other' => 0,
-                    'link'  => 0,
-                    'photo_view' => 0,
-                    'total' => 0
-                );
-
-                // decode response
-                $clicks_response_body = json_decode($clicks_response['body'], TRUE);
-
-                // check that insights data exists for these values
-                if (isset($clicks_response_body['data'][0]['values'][0]['value']))
-                {
-                    // loop the click attributes in that value
-                    foreach ($clicks_response_body['data'][0]['values'][0]['value'] as $click_type => $click_amount)
-                    {
-                        // set based on type (we previously set all to 0 so non-existence is ok)
-                        switch ($click_type)
-                        {
-                            case "other clicks":
-                                $post_clicks['other'] = $click_amount;
-                                break;
-                            case "link clicks":
-                                $post_clicks['link'] = $click_amount;
-                                break;
-                            case "photo view":
-                                $post_clicks['photo_view'] = $click_amount;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    // add them up for our total count
-                    $post_clicks['total'] = array_sum($post_clicks);
-                }
-
-                // set in our parent post by index
-                $posts[$clicks_key]['clicks'] = $post_clicks;
-            }
-        }
-
-        return $posts;
-    }
-
-    /**
-     * Grab the impressions of each post
-     *
-     * @param array $posts
-     * @return array
-     */
-    protected function get_posts_impressions(array $posts)
-    {
-        // This checks count as we use FB Graph API batcher which has a max of 50 requests per call
-        if (count($posts) > 50)
-        {
-            // handles chunking and batching of anything larger than 50 posts
-            $posts = $this->post_chunk_batcher($posts, __FUNCTION__);
-        }
-        else
-        {
-            // process our batch for this endpoint
-            $posts_batch_response = $this->process_batch($posts, '/insights/post_impressions/lifetime');
-
-            // loop 'em
-            foreach ($posts_batch_response as $impressions_key => $impressions_response)
-            {
-                // set impressions to 0 since they may not exist in insights response
-                $post_impressions = 0;
-
-                // decode our insights response
-                $impressions_response_body = json_decode($impressions_response['body'], TRUE);
-
-                // check if the value is available in our response
-                if (isset($impressions_response_body['data'][0]['values'][0]['value']))
-                {
-                    // overwrite our 0 with the amount provided
-                    $post_impressions = $impressions_response_body['data'][0]['values'][0]['value'];
-                }
-
-                // set our impressions to the right post by index
-                $posts[$impressions_key]['impressions'] = $post_impressions;
-            }
-        }
-
-        return $posts;
-    }
-
-    /**
      * Simple score calculation based on previously loaded insights data
      *
      * @param array $posts
@@ -438,12 +286,12 @@ class Guru
         {
             // This is probably not needed as we are removing posts with 0 impressions in an earlier operation...
             // that said, I'll leave it to prevent future division by 0
-            if ($post['impressions'] > 0)
+            if ($post['insights']['post_impressions'] > 0)
             {
                 // Fairly simple math operations of engagement over impressions
                 // Should read: add likes comments shares, add total LCS to total clicks, divide that by impressions,
                 // multiply that by 100 (take into the percentage realm), round that number
-                $post['score'] = round(bcadd(array_sum($post['lcs']), $post['clicks']['total']) / $post['impressions'] * 100);
+                $post['score'] = round(array_sum($post['insights']['post_stories_by_action_type']) / $post['insights']['post_impressions'] * 100);
             }
             else
             {

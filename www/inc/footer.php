@@ -32,14 +32,20 @@
                             $("#analysis").addClass("active");
                             $('#backToPageSelect').show();
                             var page_id = '<?php echo isset($route_parts[1]) ? $route_parts[1] : 0; ?>';
-                            $.post('/api/v1/posts', {"access_token": access_token, "page_id": page_id}, function(data) { render_posts(data)}, 'json');
+                            $('#loadingText').empty().append("Receiving post data from Facebook...");
+                            $.post('/api/v1/posts', {"access_token": access_token, "page_id": page_id}, function(data) {
+                                pageData = data;
+                                render_posts(pageData)
+                            }, 'json');
                             break;
                         case 'pages':
                             $("#analysis").addClass("active");
+                            $('#loadingText').empty().append("Receiving page data from Facebook...");
                             $.post('/api/v1/pages', {"access_token": access_token}, function(data) { render_pages(data)}, 'json');
                             break;
                         case 'guide':
                             $("#guide").addClass("active");
+                            $('#loadingText').empty().append("Parsing insights sample data...");
                             $.getJSON('/fixture/insight_sample_with_notes.json?123', function(data) { render_guide(data) });
                             break;
                     }
@@ -63,9 +69,9 @@
         }(document, /*debug*/ false));
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/js/app.js?123"></script>
-    <script src="/js/datasource.js?123"></script>
-    <script src="/js/loader.min.js" type="text/javascript"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js" type="text/javascript"></script>
+    <script src="/js/app.js?987"></script>
+    <script src="/js/datasource.js?987"></script>
+    <script src="/js/loader.min.js?987" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js?987" type="text/javascript"></script>
     </body>
 </html>

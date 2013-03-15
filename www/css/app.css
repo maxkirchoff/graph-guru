@@ -59,13 +59,13 @@ hr {
     line-height: 60px;
 }
 
-#postsViewHeader, #posts, #pageView, #fbLoginWrapper, #guideView {
+#postsViewHeader, #posts, #pageView, #fbLoginWrapper, #guideView, #postsViewFormula {
     background: #fff;
     border-radius: 10px;
     margin-bottom:15px;
 }
 
-#postsViewHeader div, #pageView h1, #guideView h1, #pageList {
+#postsViewHeader div, #pageView h1, #guideView h1, #pageList, #postsViewFormula div{
     margin: 15px;
 }
 
@@ -73,5 +73,12 @@ hr {
     margin: 15px;
 }
 
+.fuelux .table thead th small {
+    font-weight: normal;
+}
+
+.fuelux .table thead th {
+    vertical-align:top !important;
+}
 
 -->

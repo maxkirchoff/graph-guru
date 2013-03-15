@@ -1,5 +1,5 @@
 <div class="row">
-    <div id="guideView" class="span10 offset1" style="display:none;">
+    <div id="guideView" class="span12 offset1" style="display:none;">
         <div>
             <h1>Page Post Insights Attributes Guide</h1>
             <div id="guideWrapper">

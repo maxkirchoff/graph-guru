@@ -100,7 +100,6 @@ define(['require','jquery'],function(require) {
 			for (var i = 1; i <= data.pages; i++) {
 				pageHTML += '<li><a>' + i + '</a></li>';
 			}
-
 			this.$pagedropdown.html(pageHTML);
 		},
 
