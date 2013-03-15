@@ -399,7 +399,7 @@ class Guru
         else
         {
             // process our batch for this endpoint
-            $posts_batch_response = $this->process_batch($posts, '/insights/post_impressions_unique/lifetime');
+            $posts_batch_response = $this->process_batch($posts, '/insights/post_impressions/lifetime');
 
             // loop 'em
             foreach ($posts_batch_response as $impressions_key => $impressions_response)

@@ -1,6 +1,45 @@
 var postList = {};
 var pageStuff = '';
 
+function render_guide(sample_data)
+{
+    var guideItems = '';
+    _.each(sample_data.data, function(item) {
+        //console.log(item);
+        // handle values
+
+        // Name Key Description Possible Values
+        guideItems += '<tr><td>'+item.title+'</td><td>'+item.name+'</td><td>'+item.description+'</td><td>';
+        if (item.notes != null) {
+            guideItems += item.notes;
+        }
+        guideItems += '</td>';
+
+        if (item.values[0].value != null) {
+            if (typeof item.values[0].value === 'object') {
+                guideItems += '<td>';
+                console.log(item.values[0].value);
+                _.each(item.values[0].value, function(value) {
+                    console.log(value);
+                });
+                for(var name in item.values[0].value) {
+                    guideItems += name+'<br/>';
+                }
+                guideItems += '</td>';
+            } else {
+                guideItems += '<td>value</td>'
+            }
+        } else {
+            guideItems += '<td>N/A</td>'
+        }
+        guideItems += '</tr>'
+    });
+
+    $('#insightsGuide').append(guideItems);
+    $('#viewLoader').hide();
+    $('#guideView').show();
+}
+
 function render_pages(page_data)
 {
     // _.each(page_data, function(item) {
@@ -8,7 +47,7 @@ function render_pages(page_data)
     // });
 
     _.each(page_data, function(item) {
-        pageStuff += "<div class='span' style='margin-left:0;margin-right:10px;margin-bottom:10px'><a href='/posts/"+item.id+"/' class='btn btn-large btn-primary btn-fixed-width'>"+item.name+"</a></div>";
+        pageStuff += "<div class='span' style='margin-left:0;margin-right:10px;margin-bottom:10px'><a href='/posts/"+item.id+"/' class='btn btn-large btn-fixed-width'>"+item.name+"</a></div>";
     });
 
     $('#pageList').append(pageStuff);
@@ -100,7 +139,6 @@ function render_posts(page_data)
         delay: 250
     });
     $('#postGrid').datagrid({ dataSource: dataSource, stretchHeight: true })
-
     $('#viewLoader').hide();
     $('#postsView').show();
 }

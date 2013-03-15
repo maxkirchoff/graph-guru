@@ -59,17 +59,17 @@ hr {
     line-height: 60px;
 }
 
-#postsViewHeader, #posts, #pageView, #fbLoginWrapper {
+#postsViewHeader, #posts, #pageView, #fbLoginWrapper, #guideView {
     background: #fff;
     border-radius: 10px;
     margin-bottom:15px;
 }
 
-#postsViewHeader div, #pageView h1, #pageList {
+#postsViewHeader div, #pageView h1, #guideView h1, #pageList {
     margin: 15px;
 }
 
-#postsWrapper {
+#postsWrapper, #guideWrapper {
     margin: 15px;
 }
 
