@@ -1,9 +1,11 @@
 <?php
 namespace GraphGuru;
-use Facebook;
+use Facebook,
+    GraphGuru\PdoDriver;
 
 // establish src dir and require classes
 $src_dir = realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'src');
+require_once $src_dir . DIRECTORY_SEPARATOR . "db.php";
 require_once $src_dir . DIRECTORY_SEPARATOR . "vendors/facebook-php-sdk/src/facebook.php";
 
 /**
@@ -21,6 +23,11 @@ class Guru
      * @var \Facebook
      */
     protected $facebook;
+
+    /**
+     * @var PdoDriver
+     */
+    protected $db;
 
     /**
      * @param array $config
@@ -42,6 +49,9 @@ class Guru
 
         // set the facebook
         $this->facebook = $facebook;
+
+        PdoDriver::init();
+        $this->db = new PdoDriver();
     }
 
     /**
@@ -73,13 +83,65 @@ class Guru
         // amount to be grabbed determined in this method
         $page['posts'] = $this->get_page_posts($page_id);
 
-        // grab post score averages by type and load into page array
-        // $page['average_scores']['photo'] = $this->get_average_score_by_type($page['posts'], 'photo');
-        // $page['average_scores']['link'] = $this->get_average_score_by_type($page['posts'], 'link');
-        // $page['average_scores']['video'] = $this->get_average_score_by_type($page['posts'], 'video');
-        // $page['average_scores']['status'] = $this->get_average_score_by_type($page['posts'], 'status');
+        $this->cache_page_posts($page);
 
         return $page;
+    }
+
+    protected function cache_page_posts($page)
+    {
+        $today = strtotime('today');
+
+        try
+        {
+            foreach ($page['posts'] as $post)
+            {
+                $stmt = $this->db->handle()->prepare('SELECT * FROM post_insights WHERE fetch_time = :fetch_time AND post_id = :post_id');
+                $stmt->bindParam(':fetch_time', $today, \PDO::PARAM_INT);
+                $stmt->bindParam(':post_id', $post['id'], \PDO::PARAM_STR, 255);
+                $stmt->execute();
+                $payload = $stmt->fetchAll();
+
+                if (empty($payload))
+                {
+                    $stmt = $this->db->handle()->prepare('INSERT INTO post_insights (fetch_time, post_id, page_id, payload) VALUES (:fetch_time, :post_id, :page_id, :payload)');
+                    $stmt->bindParam(':fetch_time', $today, \PDO::PARAM_INT);
+                    $stmt->bindParam(':post_id', $post['id'], \PDO::PARAM_STR, 255);
+                    $stmt->bindParam(':page_id', $page['id'], \PDO::PARAM_STR, 255);
+                    $stmt->bindParam(':payload', json_encode($post['insights']), \PDO::PARAM_STR, 16000000);
+                    $stmt->execute();
+                }
+            }
+        }
+        catch (\Exception $e)
+        {
+            error_log("DB could not save Post insights data: " . $e->getMessage());
+        }
+    }
+
+    protected function try_post_insights_cache($post_id)
+    {
+        $today = strtotime('today');
+
+        try
+        {
+            $stmt = $this->db->handle()->prepare('SELECT * FROM post_insights WHERE fetch_time = :fetch_time AND post_id = :post_id');
+            $stmt->bindParam(':fetch_time', $today, \PDO::PARAM_INT);
+            $stmt->bindParam(':post_id', $post_id, \PDO::PARAM_STR, 255);
+            $stmt->execute();
+            $payload = $stmt->fetchAll();
+
+            if (!empty($payload))
+            {
+                $row = array_pop($payload);
+                $post_insights = json_decode($row['payload'], true);
+                return $post_insights;
+            }
+        }
+        catch (\Exception $e)
+        {
+            error_log("DB failed to get Post insights data: " . $e->getMessage());
+        }
     }
 
     /**
@@ -174,18 +236,62 @@ class Guru
         return $posts;
     }
 
+    /**
+     * @param array $posts
+     * @return array
+     */
     protected function get_posts_insights(array $posts)
+    {
+        $queued_posts = array();
+
+        foreach ($posts as $index => $post)
+        {
+            if ($post_insights = $this->try_post_insights_cache($post['id']))
+            {
+                $posts[$index]['insights'] = $post_insights;
+            }
+            else
+            {
+                $queued_posts[] = $post;
+                unset($posts[$index]);
+            }
+        }
+
+        if (!empty($queued_posts))
+        {
+            $batched_posts = $this->process_batch($queued_posts, 'insights');
+
+            $posts = array_merge($posts, $batched_posts);
+        }
+
+        return $posts;
+    }
+
+    /**
+     * Creates and calls batch process for posts on FB api
+     *
+     * @param array $posts
+     * @param $endpoint
+     * @return mixed
+     */
+    protected function process_batch(array $posts, $endpoint)
     {
         // This checks count as we use FB Graph API batcher which has a max of 50 requests per call
         if (count($posts) > 50)
         {
             // handles chunking and batching of anything larger than 50 posts
-            $posts = $this->post_chunk_batcher($posts, __FUNCTION__);
+            $posts = $this->post_chunk_batcher($posts);
         }
         else
         {
-            // send out posts for batch processing!
-            $posts_batch_response = $this->process_batch($posts, '/insights');
+            $batch_queries = array();
+
+            foreach ($posts as $post)
+            {
+                $batch_queries[] = array('method' => 'GET', 'relative_url' => '/' . $post['id'] . DIRECTORY_SEPARATOR . $endpoint);
+            }
+
+            $posts_batch_response = $this->facebook->api('/?batch=' . json_encode($batch_queries), 'POST');
 
             // separate indices and value to match our response to it's requesting post index
             foreach ($posts_batch_response as $insight_key => $insight_response)
@@ -234,7 +340,7 @@ class Guru
         return $posts;
     }
 
-    protected function post_chunk_batcher(array $posts, $method)
+    protected function post_chunk_batcher(array $posts)
     {
         // chunk our larger than 50 item array into an array of 50 piece post arrays
         $array_of_posts = array_chunk($posts, 50);
@@ -248,29 +354,10 @@ class Guru
             // call the originating method (but this call will be 50 or less and pass into actual batching in that method)
             // merge with any previous calls to now have a re-assembled and completed post array of same size
             // as original, but now with lcs counts
-            $posts = array_merge($posts, $this->$method($set_of_posts));
+            $posts = array_merge($posts, $this->process_batch($set_of_posts, 'insights'));
         }
 
         return $posts;
-    }
-
-    /**
-     * Creates and calls batch process for posts on FB api
-     *
-     * @param array $posts
-     * @param $endpoint
-     * @return mixed
-     */
-    protected function process_batch(array $posts, $endpoint)
-    {
-        $batch_queries = array();
-
-        foreach ($posts as $post)
-        {
-            $batch_queries[] = array('method' => 'GET', 'relative_url' => '/' . $post['id'] . $endpoint);
-        }
-
-        return $this->facebook->api('/?batch=' . json_encode($batch_queries), 'POST');
     }
 
     /**
@@ -316,7 +403,7 @@ class Guru
      */
     protected function compute_adjusted_scores(array $posts)
     {
-        // load score arrat
+        // load score array
         $scores = array();
 
         // loop the posts
