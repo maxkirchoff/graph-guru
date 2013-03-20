@@ -3144,7 +3144,11 @@ define('fuelux/datagrid',['require','jquery'],function(require) {
 
 			$.each(this.columns, function (index, column) {
 				colHTML += '<th data-property="' + column.property + '"';
-				if (column.sortable) colHTML += ' class="sortable"';
+				if (column.sortable) {
+                    colHTML += ' class="sortable selectable-field '+column.property+'"';
+                } else {
+                    colHTML += ' class="selectable-field  '+column.property+'"';
+                }
 				colHTML += '>' + column.label + '</th>';
 			});
 
@@ -3208,7 +3212,7 @@ define('fuelux/datagrid',['require','jquery'],function(require) {
 				$.each(data.data, function (index, row) {
 					rowHTML += '<tr>';
 					$.each(self.columns, function (index, column) {
-						rowHTML += '<td>' + row[column.property] + '</td>';
+						rowHTML += '<td class="selectable-field '+column.property+'">' + row[column.property] + '</td>';
 					});
 					rowHTML += '</tr>';
 				});

@@ -35,7 +35,7 @@
                             $('#loadingText').empty().append("Receiving post data from Facebook...");
                             $.post('/api/v1/posts', {"access_token": access_token, "page_id": page_id}, function(data) {
                                 pageData = data;
-                                render_posts(pageData)
+                                render_posts(pageData, '')
                             }, 'json');
                             break;
                         case 'pages':
@@ -69,9 +69,9 @@
         }(document, /*debug*/ false));
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/js/app.js?987"></script>
-    <script src="/js/datasource.js?987"></script>
-    <script src="/js/loader.min.js?987" type="text/javascript"></script>
+    <script src="/js/app.js?97"></script>
+    <script src="/js/datasource.js?654"></script>
+    <script src="/js/loader.js?434532" type="text/javascript"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js?987" type="text/javascript"></script>
     </body>
 </html>

@@ -1,6 +1,7 @@
 var postList = {};
 var pageStuff = '';
 var pageData = {};
+var showCount = 0;
 
 function render_guide(sample_data)
 {
@@ -61,37 +62,66 @@ function render_posts(page_data, formula)
 
             var url = '';
             if (item.type === 'photo') {
-                url = '<a href="'+item.link+'" rel="external">View Post</a>';
+                url = '<a href="'+item.link+'" target="_blank">View</a>';
             } else {
-                url = '<a href="http://facebook.com/'+item.id+'" target="_blank">View Post</a>';
+                url = '<a href="http://facebook.com/'+item.id+'" target="_blank">View</a>';
             }
 
             var datapoints = {
-                like: 0,
-                comment: 0,
-                share: 0,
-                photo_view: 0,
-                link_click: 0,
-                video_play: 0,
-                other_click: 0,
-                total_click: 0,
-                impression: item.insights.post_impressions,
-                reach: item.insights.post_impressions_unique
+                total_stories: (!!item.insights.post_story_adds) ? item.insights.post_story_adds : 0,
+                ptat: (!!item.insights.post_story_adds_unique) ? item.insights.post_story_adds_unique : 0,
+                likes: 0,
+                likes_unique: 0,
+                comments: 0,
+                comments_unique: 0,
+                shares: 0,
+                shares_unique: 0,
+                photo_views: 0,
+                photo_views_unique: 0,
+                link_clicks: 0,
+                link_clicks_unique: 0,
+                video_plays: 0,
+                video_plays_unique: 0,
+                other_clicks: 0,
+                other_clicks_unique: 0,
+                total_clicks: 0,
+                total_clicks_unique: 0,
+                impressions: item.insights.post_impressions,
+                impressions_unique: item.insights.post_impressions_unique,
+                impressions_paid: (!!item.insights.post_impressions_paid) ? item.insights.post_impressions_paid : 0,
+                impressions_paid_unique: (!!item.insights.post_impressions_paid_unique) ? item.insights.post_impressions_paid_unique : 0,
+                impressions_organic: (!!item.insights.post_impressions_organic) ? item.insights.post_impressions_organic : 0,
+                impressions_organic_unique: (!!item.insights.post_impressions_organic_unique) ? item.insights.post_impressions_organic_unique : 0,
+                impressions_viral: (!!item.insights.post_impressions_viral) ? item.insights.post_impressions_viral : 0,
+                impressions_viral_unique: (!!item.insights.post_impressions_viral_unique) ? item.insights.post_impressions_viral_unique : 0
             };
 
             if (!!item.insights.post_story_adds_by_action_type) {
-                datapoints.like = (!!item.insights.post_stories_by_action_type.like) ? item.insights.post_stories_by_action_type.like : 0;
-                datapoints.comment = (!!item.insights.post_stories_by_action_type.comment) ? item.insights.post_stories_by_action_type.comment : 0;
-                datapoints.share = (!!item.insights.post_stories_by_action_type.share) ? item.insights.post_stories_by_action_type.share : 0;
+                datapoints.likes += (!!item.insights.post_stories_by_action_type.like) ? item.insights.post_stories_by_action_type.like : 0;
+                datapoints.comments += (!!item.insights.post_stories_by_action_type.comment) ? item.insights.post_stories_by_action_type.comment : 0;
+                datapoints.shares += (!!item.insights.post_stories_by_action_type.share) ? item.insights.post_stories_by_action_type.share : 0;
+            }
+
+            if (!!item.insights.post_story_adds_by_action_type_unique) {
+                datapoints.likes_unique += (!!item.insights.post_story_adds_by_action_type_unique.like) ? item.insights.post_story_adds_by_action_type_unique.like : 0;
+                datapoints.comments_unique += (!!item.insights.post_story_adds_by_action_type_unique.comment) ? item.insights.post_story_adds_by_action_type_unique.comment : 0;
+                datapoints.shares_unique += (!!item.insights.post_story_adds_by_action_type_unique.share) ? item.insights.post_story_adds_by_action_type_unique.share : 0;
             }
 
             if (!!item.insights.post_consumptions_by_type) {
-                datapoints.other_click = (!!item.insights.post_consumptions_by_type["other clicks"]) ? item.insights.post_consumptions_by_type["other clicks"] : 0;
-                datapoints.link_click = (!!item.insights.post_consumptions_by_type["link clicks"]) ? item.insights.post_consumptions_by_type["link clicks"] : 0;
-                datapoints.photo_view = (!!item.insights.post_consumptions_by_type["photo views"]) ? item.insights.post_consumptions_by_type["photo views"] : 0;
-                datapoints.video_play = (!!item.insights.post_consumptions_by_type["video play"]) ? item.insights.post_consumptions_by_type["video play"] : 0;
+                datapoints.other_clicks += (!!item.insights.post_consumptions_by_type["other clicks"]) ? item.insights.post_consumptions_by_type["other clicks"] : 0;
+                datapoints.link_clicks += (!!item.insights.post_consumptions_by_type["link clicks"]) ? item.insights.post_consumptions_by_type["link clicks"] : 0;
+                datapoints.photo_views += (!!item.insights.post_consumptions_by_type["photo views"]) ? item.insights.post_consumptions_by_type["photo views"] : 0;
+                datapoints.video_plays += (!!item.insights.post_consumptions_by_type["video play"]) ? item.insights.post_consumptions_by_type["video play"] : 0;
+                datapoints.total_clicks += datapoints.photo_views + datapoints.link_clicks + datapoints.other_clicks + datapoints.video_plays;
+            }
 
-                datapoints.total_click = datapoints.photo_view + datapoints.link_click + datapoints.other_click + datapoints.video_play;
+            if (!!item.insights.post_consumptions_by_type_unique) {
+                datapoints.other_clicks_unique += (!!item.insights.post_consumptions_by_type_unique["other clicks"]) ? item.insights.post_consumptions_by_type_unique["other clicks"] : 0;
+                datapoints.link_clicks_unique += (!!item.insights.post_consumptions_by_type_unique["link clicks"]) ? item.insights.post_consumptions_by_type_unique["link clicks"] : 0;
+                datapoints.photo_views_unique += (!!item.insights.post_consumptions_by_type_unique["photo views"]) ? item.insights.post_consumptions_by_type_unique["photo views"] : 0;
+                datapoints.video_plays_unique += (!!item.insights.post_consumptions_by_type_unique["video play"]) ? item.insights.post_consumptions_by_type_unique["video play"] : 0;
+                datapoints.total_clicks_unique += datapoints.photo_views_unique + datapoints.link_clicks_unique + datapoints.other_clicks_unique + datapoints.video_plays_unique;
             }
 
             if (!formula) {
@@ -101,85 +131,174 @@ function render_posts(page_data, formula)
             postList[i] = {
                 "url": url,
                 "type": item.type,
-                "likes": datapoints.like,
-                "comments": datapoints.comment,
-                "shares":   datapoints.share,
-                "photo_views": datapoints.photo_view,
-                "video_plays": datapoints.video_play,
-                "link_clicks":   datapoints.link_click,
-                // The 'non value' impressions are weeded out way earlier
-                "impressions": datapoints.impression,
-                "reach": datapoints.reach,
-                // "adjusted_score": item.adjusted_score,
+                "total_stories": datapoints.total_stories,
+                "ptat": datapoints.ptat,
+                "likes": datapoints.likes,
+                "likes_unique": datapoints.likes_unique,
+                "comments": datapoints.comments,
+                "comments_unique": datapoints.comments_unique,
+                "shares":   datapoints.shares,
+                "shares_unique": datapoints.shares_unique,
+                "photo_views": datapoints.photo_views,
+                "photo_views_unique": datapoints.photo_views_unique,
+                "video_plays": datapoints.video_plays,
+                "video_plays_unique": datapoints.video_plays_unique,
+                "link_clicks":   datapoints.link_clicks,
+                "link_clicks_unique":   datapoints.link_clicks_unique,
+                "other_clicks": datapoints.other_clicks,
+                "other_clicks_unique": datapoints.other_clicks_unique,
+                "total_clicks": datapoints.total_clicks,
+                "total_clicks_unique": datapoints.total_clicks_unique,
+                "impressions": datapoints.impressions,
+                "impressions_unique": datapoints.impressions_unique,
+                "impressions_paid": datapoints.impressions_paid,
+                "impressions_paid_unique": datapoints.impressions_paid_unique,
+                "impressions_organic": datapoints.impressions_organic,
+                "impressions_organic_unique": datapoints.impressions_organic_unique,
+                "impressions_viral": datapoints.impressions_viral,
+                "impressions_viral_unique": datapoints.impressions_viral_unique,
                 "score": implement_formula(formula, datapoints)
                 // "score": Math.round(((actions.like+actions.comment+actions.share)/item.insights.post_impressions)*100)/100
             };
             i++;
         });
     } catch (e) {
+        console.log(e.message);
         alert("You put in a bad formula, please edit it and resubmit.");
         return false;
     }
 
+    var table_columns = [
+        {
+            property: 'url',
+            label: 'Link',
+            sortable: true
+        },
+        {
+            property: 'type',
+            label: 'Type',
+            sortable: true
+        },
+        {
+            property: 'likes',
+            label: 'L',
+            sortable: true
+        },
+        {
+            property: 'likes_unique',
+            label: 'L u',
+            sortable: true
+        },
+        {
+            property: 'comments',
+            label: 'C',
+            sortable: true
+        },
+        {
+            property: 'comments_unique',
+            label: 'C u',
+            sortable: true
+        },
+        {
+            property: 'shares',
+            label: 'S',
+            sortable: true
+        },
+        {
+            property: 'shares_unique',
+            label: 'S u',
+            sortable: true
+        },
+        {
+            property: 'photo_views',
+            label: 'PV',
+            sortable: true
+        },
+        {
+            property: 'photo_views_unique',
+            label: 'PV u',
+            sortable: true
+        },
+        {
+            property: 'video_plays',
+            label: 'VP',
+            sortable: true
+        },
+        {
+            property: 'video_plays_unique',
+            label: 'VP u',
+            sortable: true
+        },
+        {
+            property: 'link_clicks',
+            label: 'LC',
+            sortable: true
+        },
+        {
+            property: 'link_clicks_unique',
+            label: 'LC u',
+            sortable: true
+        },
+        {
+            property: 'other_clicks',
+            label: 'OC',
+            sortable: true
+        },
+        {
+            property: 'other_clicks_unique',
+            label: 'OC u',
+            sortable: true
+        },
+        {
+            property: 'impressions',
+            label: 'I',
+            sortable: true
+        },
+        {
+            property: 'impressions_unique',
+            label: 'I u',
+            sortable: true
+        },
+        {
+            property: 'impressions_organic',
+            label: 'I o',
+            sortable: true
+        },
+        {
+            property: 'impressions_organic_unique',
+            label: 'I ou',
+            sortable: true
+        },
+        {
+            property: 'impressions_viral',
+            label: 'I v',
+            sortable: true
+        },
+        {
+            property: 'impressions_viral_unique',
+            label: 'I vu',
+            sortable: true
+        },
+        {
+            property: 'impressions_paid',
+            label: 'I p',
+            sortable: true
+        },
+        {
+            property: 'impressions_paid_unique',
+            label: 'I pu',
+            sortable: true
+        },
+        {
+            property: 'score',
+            label: 'Score',
+            sortable: true
+        }
+    ];
+
     // INITIALIZING THE DATAGRID
     var dataSource = new StaticDataSource({
-        columns: [
-            {
-                property: 'url',
-                label: 'Link',
-                sortable: true
-            },
-            {
-                property: 'type',
-                label: 'Type',
-                sortable: true
-            },
-            {
-                property: 'likes',
-                label: 'Likes',
-                sortable: true
-            },
-            {
-                property: 'comments',
-                label: 'Comments',
-                sortable: true
-            },
-            {
-                property: 'shares',
-                label: 'Shares',
-                sortable: true
-            },
-            {
-                property: 'photo_views',
-                label: 'Photo Views',
-                sortable: true
-            },
-            {
-                property: 'video_plays',
-                label: 'Video Plays',
-                sortable: true
-            },
-            {
-                property: 'link_clicks',
-                label: 'Link Clicks',
-                sortable: true
-            },
-            {
-                property: 'impressions',
-                label: 'Impressions',
-                sortable: true
-            },
-            {
-                property: 'reach',
-                label: 'Reach',
-                sortable: true
-            },
-            {
-                property: 'score',
-                label: 'Score',
-                sortable: true
-            }
-        ],
+        columns: table_columns,
         data: postList,
         delay: 250
     });
@@ -192,22 +311,43 @@ function render_posts(page_data, formula)
     $('.statusScore').empty().append(averageScore.status);
 
     $('#postGrid').datagrid({ dataSource: dataSource, stretchHeight: true }).data('datagrid').reload();
+
     $('#viewLoader').hide();
     $('#postsView').show();
 }
 
+function build_metric_checkboxes(table_columns) {
+    var checkboxHTML = '<table><tbody><tr>';
+    var i = 0;
+    _.each(table_columns, function(column) {
+        if ((i !== 0) && (i % 8 === 0)) {
+            checkboxHTML += '</tr><tr>';
+        }
+        checkboxHTML += '<td><input type="button" class="metricToggle btn btn-small btn-primary btn-fixed-width" data-metric-name="'+column.property+'" value="hide" /><br />'+column.label+'</td>';
+        i++;
+    });
+
+    checkboxHTML += '</tr></tbody></table>';
+
+    $('#metricCheckboxes').append(checkboxHTML);
+}
+
 function implement_formula(formula, datapoints) {
-    var likes = datapoints.like;
-    var comments = datapoints.comment;
-    var shares = datapoints.share;
-    var photo_views = datapoints.photo_view;
-    var video_plays = datapoints.video_play;
-    var link_clicks = datapoints.link_click;
-    var impressions = datapoints.impression;
-    var reach = datapoints.reach;
+
+    var self = this;
+
+    _.each(datapoints, function(datapoint, index) {
+        self[index] = datapoint;
+    });
 
     try {
-        return Math.round((eval(formula))*100)/100;
+        // (comments+likes)/impressions
+        console.log(formula);
+        var new_score = Math.round((eval(formula))*100)/100;
+        if (new_score === Infinity) {
+            new_score = 0;
+        }
+        return new_score;
     } catch(e) {
         console.log(e);
         throw(e);
@@ -266,8 +406,10 @@ function onFacebookConnect() {
 }
 
 $(function() {
-    $('#formulaForm').submit(function() {
+    $(".fuelux").on("submit", "#formulaForm", function(){
+        console.log("no worky?");
         var formula = $("textarea:first").val();
+        console.log(formula);
         render_posts(pageData, formula);
         return false;
     });

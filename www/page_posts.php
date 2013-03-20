@@ -31,10 +31,10 @@
             <div id="posts" class="span12 offset1">
                 <div id="postsWrapper">
                     <h1>Post Metrics</h1>
-                    <div class="accordion" id="accordion2">
+                    <div class="accordion" id="accordion1">
                         <div class="accordion-group">
                             <div class="accordion-heading">
-                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">
                                     <i class="icon-align-justify"></i> <strong>Modify Score Formula</strong>
                                 </a>
                             </div>
@@ -58,35 +58,45 @@
                                             <thead>
                                             <tr>
                                                 <th>Measure</th>
-                                                <th>Formula Variable</th>
+                                                <th>Formula Variable(s)</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <tr>
                                                 <td>Likes</td>
-                                                <td>likes</td>
+                                                <td>likes<br />
+                                                    likes_unique</td>
                                             </tr>
                                             <tr>
                                                 <td>Comments</td>
-                                                <td>comments</td>
+                                                <td>comments<br />
+                                                    comments_unique</td>
                                             </tr><tr>
                                                 <td>Shares</td>
-                                                <td>shares</td>
+                                                <td>shares<br />
+                                                    shares_unique</td>
                                             </tr><tr>
                                                 <td>Photo Views</td>
-                                                <td>photo_views</td>
+                                                <td>photo_views<br />
+                                                    photo_views_unique</td>
                                             </tr><tr>
                                                 <td>Video Plays</td>
-                                                <td>video_plays</td>
+                                                <td>video_plays<br />
+                                                    video_plays_unique</td>
                                             </tr><tr>
                                                 <td>Link Clicks</td>
-                                                <td>link_clicks</td>
+                                                <td>link_clicks<br />
+                                                    link_clicks_unique</td>
                                             </tr><tr>
                                                 <td>Impressions</td>
-                                                <td>impressions</td>
-                                            </tr><tr>
-                                                <td>Reach</td>
-                                                <td>reach</td>
+                                                <td>impressions<br />
+                                                    impressions_unique<br />
+                                                    impressions_organic<br />
+                                                    impressions_organic_unique<br />
+                                                    impressions_viral<br />
+                                                    impressions_viral_unique<br />
+                                                    impressions_paid<br />
+                                                    impressions_paid_unique</td>
                                             </tr>
                                             </tbody>
                                         </table>

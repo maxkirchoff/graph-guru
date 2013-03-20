@@ -4,6 +4,7 @@
 
 *, body {
     font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
 }
 
 body {
@@ -79,6 +80,18 @@ hr {
 
 .fuelux .table thead th {
     vertical-align:top !important;
+}
+
+.likes_unique, .comments_unique, .shares_unique, .impressions_unique, .impressions_viral, .impressions_viral_unique,
+.impressions_organic, .impressions_organic_unique, .impressions_paid, .impressions_paid_unique, .photo_views_unique,
+.link_clicks_unique, .total_clicks_unique, .video_plays_unique, .other_clicks_unique {
+    /* display: none; */
+}
+
+#metricCheckboxes td {
+    padding: 10px;
+    text-align: center;
+    vertical-align: top;
 }
 
 -->
