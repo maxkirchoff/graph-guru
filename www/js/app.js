@@ -342,7 +342,6 @@ function implement_formula(formula, datapoints) {
 
     try {
         // (comments+likes)/impressions
-        console.log(formula);
         var new_score = Math.round((eval(formula))*100)/100;
         if (new_score === Infinity) {
             new_score = 0;
@@ -407,9 +406,7 @@ function onFacebookConnect() {
 
 $(function() {
     $(".fuelux").on("submit", "#formulaForm", function(){
-        console.log("no worky?");
         var formula = $("textarea:first").val();
-        console.log(formula);
         render_posts(pageData, formula);
         return false;
     });
