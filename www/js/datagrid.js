@@ -228,6 +228,7 @@ define(['require','jquery'],function(require) {
 		reload: function () {
 			this.options.dataOptions.pageIndex = 0;
 			this.renderData();
+            this.renderColumns();
 		},
 
 		initStretchHeight: function () {
@@ -249,7 +250,7 @@ define(['require','jquery'],function(require) {
 			this.$tfoot.detach().appendTo(this.$footerTable);
 		},
 
-		stretchHeight: function () {
+        stretchHeight: function () {
 			if (!this.$gridContainer) return;
 
 			this.setColumnWidths();

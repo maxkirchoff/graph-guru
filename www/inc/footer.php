@@ -69,7 +69,7 @@
         }(document, /*debug*/ false));
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/js/app.js?97"></script>
+    <script src="/js/app.js?97r23wd"></script>
     <script src="/js/datasource.js?654"></script>
     <script src="/js/loader.js?434532" type="text/javascript"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js?987" type="text/javascript"></script>

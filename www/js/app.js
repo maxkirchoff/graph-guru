@@ -1,7 +1,35 @@
 var postList = {};
 var pageStuff = '';
 var pageData = {};
-var showCount = 0;
+var formula = '(likes+comments+shares)/impressions';
+var activeColumns = ['url', 'type', 'likes', 'comments', 'shares', 'impressions'];
+var possibleColumns = {
+        'score': 'Score',
+        'url': 'Link',
+        'type': 'Type',
+        'likes': 'Likes',
+        'likes_unique': 'Likes (unique)',
+        'comments': 'Comments',
+        'comments_unique': 'Comments (unique)',
+        'shares': 'Shares',
+        'shares_unique': 'Shares (unique)',
+        'photo_views': 'Photo Views',
+        'photo_views_unique': 'Photo Views (unique)',
+        'video_plays': 'Video Plays',
+        'video_plays_unique': 'Video Plays (unique)',
+        'link_clicks': 'Link Clicks',
+        'link_clicks_unique': 'Link Clicks (unique)',
+        'other_clicks': 'Other Clicks',
+        'other_clicks_unique': 'Other Clicks (unique)',
+        'impressions': 'Impressions',
+        'impressions_unique': 'Impressions (unique)',
+        'impressions_organic': 'Impressions (organic)',
+        'impressions_organic_unique': 'Impressions (organic & unique)',
+        'impressions_viral': 'Impressions (viral)',
+        'impressions_viral_unique': 'Impressions (viral & unique)',
+        'impressions_paid': 'Impressions (paid)',
+        'impressions_paid_unique': 'Impressions (paid & unique)'
+    };
 
 function render_guide(sample_data)
 {
@@ -39,10 +67,6 @@ function render_guide(sample_data)
 
 function render_pages(page_data)
 {
-    // _.each(page_data, function(item) {
-    //    $('#pageList').append("<div class='span' style='margin-left:0;margin-right:10px;margin-bottom:10px'><a href='/posts/"+item.id+"/' class='btn btn-large btn-primary btn-fixed-width'>"+item.name+"</a></div>");
-    // });
-
     _.each(page_data, function(item) {
         pageStuff += "<div class='span' style='margin-left:0;margin-right:10px;margin-bottom:10px'><a href='/posts/"+item.id+"/' class='btn btn-large btn-fixed-width'>"+item.name+"</a></div>";
     });
@@ -52,7 +76,7 @@ function render_pages(page_data)
     $('#pageView').show();
 }
 
-function render_posts(page_data, formula)
+function render_posts(page_data)
 {
     $('#loadingText').empty().append("Calculating post metrics...");
     var i = 0;
@@ -124,10 +148,6 @@ function render_posts(page_data, formula)
                 datapoints.total_clicks_unique += datapoints.photo_views_unique + datapoints.link_clicks_unique + datapoints.other_clicks_unique + datapoints.video_plays_unique;
             }
 
-            if (!formula) {
-                formula = "(likes+comments+shares)/impressions"
-            }
-
             postList[i] = {
                 "url": url,
                 "type": item.type,
@@ -158,7 +178,6 @@ function render_posts(page_data, formula)
                 "impressions_viral": datapoints.impressions_viral,
                 "impressions_viral_unique": datapoints.impressions_viral_unique,
                 "score": implement_formula(formula, datapoints)
-                // "score": Math.round(((actions.like+actions.comment+actions.share)/item.insights.post_impressions)*100)/100
             };
             i++;
         });
@@ -168,137 +187,21 @@ function render_posts(page_data, formula)
         return false;
     }
 
-    var table_columns = [
-        {
-            property: 'url',
-            label: 'Link',
-            sortable: true
-        },
-        {
-            property: 'type',
-            label: 'Type',
-            sortable: true
-        },
-        {
-            property: 'likes',
-            label: 'L',
-            sortable: true
-        },
-        {
-            property: 'likes_unique',
-            label: 'L u',
-            sortable: true
-        },
-        {
-            property: 'comments',
-            label: 'C',
-            sortable: true
-        },
-        {
-            property: 'comments_unique',
-            label: 'C u',
-            sortable: true
-        },
-        {
-            property: 'shares',
-            label: 'S',
-            sortable: true
-        },
-        {
-            property: 'shares_unique',
-            label: 'S u',
-            sortable: true
-        },
-        {
-            property: 'photo_views',
-            label: 'PV',
-            sortable: true
-        },
-        {
-            property: 'photo_views_unique',
-            label: 'PV u',
-            sortable: true
-        },
-        {
-            property: 'video_plays',
-            label: 'VP',
-            sortable: true
-        },
-        {
-            property: 'video_plays_unique',
-            label: 'VP u',
-            sortable: true
-        },
-        {
-            property: 'link_clicks',
-            label: 'LC',
-            sortable: true
-        },
-        {
-            property: 'link_clicks_unique',
-            label: 'LC u',
-            sortable: true
-        },
-        {
-            property: 'other_clicks',
-            label: 'OC',
-            sortable: true
-        },
-        {
-            property: 'other_clicks_unique',
-            label: 'OC u',
-            sortable: true
-        },
-        {
-            property: 'impressions',
-            label: 'I',
-            sortable: true
-        },
-        {
-            property: 'impressions_unique',
-            label: 'I u',
-            sortable: true
-        },
-        {
-            property: 'impressions_organic',
-            label: 'I o',
-            sortable: true
-        },
-        {
-            property: 'impressions_organic_unique',
-            label: 'I ou',
-            sortable: true
-        },
-        {
-            property: 'impressions_viral',
-            label: 'I v',
-            sortable: true
-        },
-        {
-            property: 'impressions_viral_unique',
-            label: 'I vu',
-            sortable: true
-        },
-        {
-            property: 'impressions_paid',
-            label: 'I p',
-            sortable: true
-        },
-        {
-            property: 'impressions_paid_unique',
-            label: 'I pu',
-            sortable: true
-        },
-        {
-            property: 'score',
-            label: 'Score',
-            sortable: true
+    var tableColumns = [];
+
+    _.each(possibleColumns, function(columnLabel, columnProperty) {
+        if (($.inArray(columnProperty, activeColumns) > -1) || columnProperty === 'score') {
+            tableColumns.push({
+                property: columnProperty,
+                label: columnLabel,
+                sortable: true
+            });
         }
-    ];
+    });
 
     // INITIALIZING THE DATAGRID
     var dataSource = new StaticDataSource({
-        columns: table_columns,
+        columns: tableColumns,
         data: postList,
         delay: 250
     });
@@ -311,6 +214,8 @@ function render_posts(page_data, formula)
     $('.statusScore').empty().append(averageScore.status);
 
     $('#postGrid').datagrid({ dataSource: dataSource, stretchHeight: true }).data('datagrid').reload();
+
+    $('#postGrid').datagrid({ dataSource: dataSource, stretchHeight: true }).data('datagrid').renderColumns(tableColumns);
 
     $('#viewLoader').hide();
     $('#postsView').show();
@@ -341,7 +246,6 @@ function implement_formula(formula, datapoints) {
     });
 
     try {
-        // (comments+likes)/impressions
         var new_score = Math.round((eval(formula))*100)/100;
         if (new_score === Infinity) {
             new_score = 0;
@@ -404,6 +308,29 @@ function onFacebookConnect() {
     window.location = '';
 }
 
+function buildMetricCheckboxes() {
+    var checkboxHTML = '<table><tr>';
+
+    var i = 0;
+
+    _.each(possibleColumns, function(columnName, columnProperty) {
+        if (columnProperty != 'score') {
+            if ((i != 0) && (i%10 === 0)) {
+                checkboxHTML += '</tr><tr>';
+            }
+
+            if ($.inArray(columnProperty, activeColumns) > -1) {
+                checkboxHTML += '<td><input type="button" class="btn btn-fixed-width metricToggle" data-metric-property="'+columnProperty+'" value="hide" /><br/>'+columnName+'</td>';
+            } else {
+                checkboxHTML += '<td><input type="button" class="btn btn-fixed-width metricToggle" data-metric-property="'+columnProperty+'" value="show" /><br/>'+columnName+'</td>';
+            }
+            i++;
+        }
+    });
+    checkboxHTML += '</tr></table>';
+    $('#metricCheckboxes').append(checkboxHTML);
+}
+
 $(function() {
     $(".fuelux").on("submit", "#formulaForm", function(){
         var formula = $("textarea:first").val();
@@ -412,4 +339,27 @@ $(function() {
     });
 
     $(".collapse").collapse();
+
+    buildMetricCheckboxes();
+
+    $('#metricCheckboxes').on("click", 'input', function() {
+        if($(this).val() === 'show') {
+            activeColumns.push($(this).data('metric-property'));
+            $(this).val('hide');
+            render_posts(pageData);
+            if (activeColumns.length > 9) {
+                $('input[value="show"]').addClass('disabled');
+            }
+        } else {
+            removeColumn = $(this).data('metric-property');
+            activeColumns = $.grep(activeColumns, function(value) {
+                return value != removeColumn;
+            });
+            $(this).val('show');
+            render_posts(pageData);
+            if (activeColumns.length <= 9) {
+                $('input[value="show"]').removeClass('disabled');
+            }
+        }
+    });
 });

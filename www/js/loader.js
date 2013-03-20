@@ -3134,14 +3134,14 @@ define('fuelux/datagrid',['require','jquery'],function(require) {
 
 		constructor: Datagrid,
 
-		renderColumns: function () {
-			var self = this;
+		renderColumns: function (columns) {
+			if(columns) this.columns = columns;
+            var self = this;
 
 			this.$footer.attr('colspan', this.columns.length);
 			this.$topheader.attr('colspan', this.columns.length);
 
 			var colHTML = '';
-
 			$.each(this.columns, function (index, column) {
 				colHTML += '<th data-property="' + column.property + '"';
 				if (column.sortable) {
@@ -3152,7 +3152,7 @@ define('fuelux/datagrid',['require','jquery'],function(require) {
 				colHTML += '>' + column.label + '</th>';
 			});
 
-			self.$colheader.append(colHTML);
+			self.$colheader.empty().append(colHTML);
 		},
 
 		updateColumns: function ($target, direction) {

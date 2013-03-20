@@ -132,6 +132,23 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="accordion-heading">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseTwo">
+                                    <i class="icon-align-justify"></i> <strong>Configure Displayed Metrics</strong>
+                                </a>
+                            </div>
+                            <div id="collapseTwo" class="accordion-body collapse in">
+                                <div class="accordion-inner">
+                                    <div class="span5">
+                                        <div>
+                                            <h5>Show or Hide Metrics</h5>
+                                            <p>Please only select 7 metrics at a time.</p>
+                                        </div>
+                                        <div id="metricCheckboxes">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
