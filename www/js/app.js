@@ -333,8 +333,9 @@ function buildMetricCheckboxes() {
 
 $(function() {
     $(".fuelux").on("submit", "#formulaForm", function(){
-        var formula = $("textarea:first").val();
-        render_posts(pageData, formula);
+        formula = $("textarea:first").val();
+        render_posts(pageData);
+        console.log(formula);
         return false;
     });
 
